@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<p>
+    Отобразить на странице браузера, форму отправкаи комментариев, с обязательные полями для заполнения: Имя, email, текс.
+    По возможность ограничить минимальную и максимальную длину вводимого текста при помощи js и продублировать проверку в обработчике.
+    Так-же по возможности JS-сом проверять корректность введения E-maila и продублировать проверку в файле обработчика формы.
+    Результат обработки формы сохраняется в таблицу БД(PDO) как история и отправляется стандартной функцией PHP(доходит письмо или нет не столько важно).
+    *По возможности задание с формой реализовать по типу паттерна MVC(самый простой вариант)
+</p>
+
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success">
+        {{ message }}
+    </div>
+{% endfor %}
+
+{{ form_start(form, {'attr': {'id': 'comment_form'}}) }}
+    <div id="validate_error"></div>
+{{ form_widget(form) }}
+{{ form_end(form) }}
+
+
+
+
+
+<script>
+    function validateEmail(email) {
+        var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+        return re.test(email);
+    }
+
+    function checkLength(value, min, max) {
+        var check = false;
+
+        if (value.length >= min && value.length <= max) {
+            check = true;
+        }
+
+        return check;
+    }
+
+    $(document).on('click', '#form_save', function (event) {
+        event.preventDefault();
+        var inputs = $('#comment_form :input');
+        var checkValidate = true;
+
+        $('.validate-error').remove();
+        inputs.each(function () {
+
+            if ($(this).attr('data-validate-length')) {
+                if (checkLength($(this).val(), $(this).attr('data-min-length'), $(this).attr('data-max-length')) === false) {
+                    $(this).parent().append('<label class="validate-error" style="color:red"> - required min/max length</label>');
+                    checkValidate = false;
+                }
+            }
+
+            if ($(this).attr('data-validate-email')) {
+                if (!validateEmail($(this).val())) {
+                    $(this).parent().append('<label class="validate-error" style="color:red"> - is not valid email</label>');
+                    checkValidate = false;
+                }
+            }
+
+        });
+
+        if (checkValidate === true) {
+            $('#comment_form').submit();
+        }
+
+        return false;
+    });
+</script>
+
+{% endblock %}

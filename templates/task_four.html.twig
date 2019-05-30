@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<p>
+    При помощи библиотеки "simplehtmldom", спарсить с любой странице в интернете список популярных песен и сохранить их в файл.
+</p>
+
+    <p>Top by {{ topBy }} : </p>
+
+    <ul>
+    {% for music in musicTop %}
+        <li>{{ music }}]</li>
+    {% endfor %}
+    </ul>
+
+    <p>Top save to file.</p>
+{% endblock %}
